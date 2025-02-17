@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.backend.entity.TrafficEntity;
 import com.backend.services.TrafficServices;
 
-@CrossOrigin("http://localhost:5173/")
+@CrossOrigin("https://trafficnotifier.netlify.app/")
 @RestController
 @RequestMapping("/traffic")
 public class TrafficController {
