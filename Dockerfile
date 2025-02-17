@@ -1,0 +1,18 @@
+FROM maven:3.8.5-openjdk-17 AS build
+COPY . .
+RUN mvn clean package -DskipTests
+
+FROM openjdk:17.0.1-jdk-slim
+COPY --from=build /target/backend-0.0.1-SNAPSHOT.jar demo.jar
+EXPOSE 8080
+
+# Set environment variables (for local testing only, remove in production)
+ENV SPRING_MAIL_USERNAME=${SPRING_MAIL_USERNAME}
+ENV SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD}
+ENV SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+ENV SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+ENV SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+ENV MAP_BASE_URI=${MAP_BASE_URI}
+ENV MAP_API_KEY=${MAP_API_KEY}
+
+ENTRYPOINT ["java","-jar","demo.jar"]
