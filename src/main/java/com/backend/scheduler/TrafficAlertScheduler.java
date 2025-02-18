@@ -115,7 +115,11 @@ public class TrafficAlertScheduler {
         List<com.backend.entity.TrafficEntity> schedules = trafficRepository.findAll();
         System.out.println(schedules);
 
-        String currentTime = LocalTime.now().format(TIME_FORMATTER);
+        //String currentTime = LocalTime.now().format(TIME_FORMATTER);
+
+        LocalTime localTime = LocalTime.now();
+        LocalTime updatedTime = localTime.plusHours(5).plusMinutes(30); // Add 5 hours and 30 minutes
+        String currentTime = updatedTime.format(TIME_FORMATTER);
 
         for (TrafficEntity schedule : schedules) {
             Set<String> times = schedule.getTime();
