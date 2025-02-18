@@ -89,31 +89,9 @@ public class TrafficAlertScheduler {
             JsonNode trafficDurationText = elements.path("duration_in_traffic").path("text");
 
             if (!durationValue.isMissingNode() && schedule.getExpectedTime() > durationValue.asInt()) {
-                //sendEmail(schedule, "Good News! No Traffic 🚗", NoTrafficTemplate, distanceText, durationText, trafficDurationText);
-                try {
-                    emailService.sendHtmlEmail(schedule.getEmail(), "Good News! No Traffic 🚗",
-                            NoTrafficTemplate.replace("[SOURCE_LOCATION]", schedule.getSource())
-                            .replace("[DESTINATION_LOCATION]", schedule.getDestination())
-                            .replace("[DISTANCE]", String.valueOf(distanceText))
-                            .replace("[AVG_TIME]", String.valueOf(durationText))
-                            .replace("[TRAFFIC_TIME]", String.valueOf(trafficDurationText))
-                            .replace("[MAP_LINK]", "https://www.google.com/maps/dir/"+schedule.getSource()+"/"+schedule.getDestination()));
-                } catch (MessagingException e) {
-                    System.err.println("Failed to send email: " + e.getMessage());
-                }
+                sendEmail(schedule, "Good News! No Traffic 🚗", NoTrafficTemplate, distanceText, durationText, trafficDurationText);
             } else {
-                //sendEmail(schedule, "Traffic Alert 🚦", TrafficTemplate, distanceText, durationText, trafficDurationText);
-                try {
-                    emailService.sendHtmlEmail(schedule.getEmail(), "Traffic Alert 🚦",
-                            TrafficTemplate.replace("[SOURCE_LOCATION]", schedule.getSource())
-                            .replace("[DESTINATION_LOCATION]", schedule.getDestination())
-                            .replace("[DISTANCE]", String.valueOf(distanceText))
-                            .replace("[AVG_TIME]", String.valueOf(durationText))
-                            .replace("[TRAFFIC_TIME]", String.valueOf(trafficDurationText))
-                            .replace("[MAP_LINK]", "https://www.google.com/maps/dir/"+schedule.getSource()+"/"+schedule.getDestination()));
-                } catch (MessagingException e) {
-                    System.err.println("Failed to send email: " + e.getMessage());
-                }
+                sendEmail(schedule, "Traffic Alert 🚦", TrafficTemplate, distanceText, durationText, trafficDurationText);
             }
 
         } catch (IOException | InterruptedException e) {
@@ -138,45 +116,61 @@ public class TrafficAlertScheduler {
     }
 
     private static final String NoTrafficTemplate = """
-        <!DOCTYPE html>
-        <html>
-        <head><title>No Traffic Alert</title></head>
-        <style type="text/css">
-            body { font-family: Arial, sans-serif; background-color: #f6f6f6; margin: 0; padding: 20px; }
-            .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 5px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); }
-            .header { background-color: #28A745; color: white; text-align: center; padding: 10px; font-size: 18px; font-weight: bold; border-radius: 5px 5px 0 0; }
-            .content { padding: 20px; font-size: 14px; color: #333; }
-            .button { display: inline-block; padding: 10px 15px; margin-top: 10px; background-color: #348eda; color: white; text-decoration: none; border-radius: 5px; }
-        </style>
-        <body>
-            <h3>Good News! No Traffic 🚗</h3>
-            <p>Your route from <strong>[SOURCE_LOCATION]</strong> to <strong>[DESTINATION_LOCATION]</strong> is clear.</p>
-            <p><strong>Distance:</strong> [DISTANCE]</p>
-            <p><strong>Expected Travel Time:</strong> [AVG_TIME]</p>
-            <p>Enjoy a smooth and hassle-free journey.</p>
-            <a href="[MAP_LINK]">Check Route</a>
-        </body>
-        </html>""";
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta name="viewport" content="width=device-width">
+                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+                <title>No Traffic Alert</title>
+                <style type="text/css">
+                    body { font-family: Arial, sans-serif; background-color: #f6f6f6; margin: 0; padding: 20px; }
+                    .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 5px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); }
+                    .header { background-color: #28A745; color: white; text-align: center; padding: 10px; font-size: 18px; font-weight: bold; border-radius: 5px 5px 0 0; }
+                    .content { padding: 20px; font-size: 14px; color: #333; }
+                    .button { display: inline-block; padding: 10px 15px; margin-top: 10px; background-color: #348eda; color: white; text-decoration: none; border-radius: 5px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">Good News! No Traffic 🚗</div>
+                    <div class="content">
+                        <p>Your route from <strong>[SOURCE_LOCATION]</strong> to <strong>[DESTINATION_LOCATION]</strong> is clear.</p>
+                        <p><strong>Distance:</strong> [DISTANCE]</p>
+                        <p><strong>Expected Travel Time:</strong> [AVG_TIME]</p>
+                        <p>Enjoy a smooth and hassle-free journey.</p>
+                        <a href="[MAP_LINK]" class="button">Check Route</a>
+                    </div>
+                </div>
+            </body>
+            </html>""";
 
     private static final String TrafficTemplate = """
-        <!DOCTYPE html>
-        <html>
-        <head><title>Traffic Alert</title></head>
-        <style type="text/css">
-            body { font-family: Arial, sans-serif; background-color: #f6f6f6; margin: 0; padding: 20px; }
-            .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 5px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); }
-            .header { background-color: #FF4C4C; color: white; text-align: center; padding: 10px; font-size: 18px; font-weight: bold; border-radius: 5px 5px 0 0; }
-            .content { padding: 20px; font-size: 14px; color: #333; }
-            .button { display: inline-block; padding: 10px 15px; margin-top: 10px; background-color: #348eda; color: white; text-decoration: none; border-radius: 5px; }
-        </style>
-        <body>
-            <h3>Traffic Alert 🚦</h3>
-            <p>There is traffic on your route from <strong>[SOURCE_LOCATION]</strong> to <strong>[DESTINATION_LOCATION]</strong>.</p>
-            <p><strong>Distance:</strong> [DISTANCE]</p>
-            <p><strong>Average Travel Time:</strong> [AVG_TIME]</p>
-            <p><strong>Current Traffic Time:</strong> [TRAFFIC_TIME]</p>
-            <p>We recommend leaving early or choosing an alternate route.</p>
-            <a href="[MAP_LINK]">Check Route</a>
-        </body>
-        </html>""";
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta name="viewport" content="width=device-width">
+                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+                <title>Traffic Alert</title>
+                <style type="text/css">
+                    body { font-family: Arial, sans-serif; background-color: #f6f6f6; margin: 0; padding: 20px; }
+                    .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 5px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); }
+                    .header { background-color: #FF4C4C; color: white; text-align: center; padding: 10px; font-size: 18px; font-weight: bold; border-radius: 5px 5px 0 0; }
+                    .content { padding: 20px; font-size: 14px; color: #333; }
+                    .button { display: inline-block; padding: 10px 15px; margin-top: 10px; background-color: #348eda; color: white; text-decoration: none; border-radius: 5px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">Traffic Alert 🚦</div>
+                    <div class="content">
+                        <p>There is traffic on your route from <strong>[SOURCE_LOCATION]</strong> to <strong>[DESTINATION_LOCATION]</strong>.</p>
+                        <p><strong>Distance:</strong> [DISTANCE]</p>
+                        <p><strong>Average Travel Time:</strong> [AVG_TIME]</p>
+                        <p><strong>Current Traffic Time:</strong> [TRAFFIC_TIME]</p>
+                        <p>We recommend leaving early or choosing an alternate route.</p>
+                        <a href="[MAP_LINK]" class="button">Check Route</a>
+                    </div>
+                </div>
+            </body>
+            </html>""";
 }
