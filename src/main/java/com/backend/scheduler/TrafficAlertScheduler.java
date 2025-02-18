@@ -2,11 +2,9 @@ package com.backend.scheduler;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -129,11 +127,15 @@ public class TrafficAlertScheduler {
                 System.out.println(
                         "Traffic alert for route: " + schedule.getSource() + " to " + schedule.getDestination());
 
-                String encodedSource = URLEncoder.encode(schedule.getSource(), StandardCharsets.UTF_8);
-                String encodedDestination = URLEncoder.encode(schedule.getDestination(), StandardCharsets.UTF_8);
+                // String encodedSource = URLEncoder.encode(schedule.getSource(), StandardCharsets.UTF_8);
+                // String encodedDestination = URLEncoder.encode(schedule.getDestination(), StandardCharsets.UTF_8);
 
-                String url = AUTO_BASE_URI + encodedSource +
-                        "&destinations=" + encodedDestination +
+                // String url = AUTO_BASE_URI + encodedSource +
+                //         "&destinations=" + encodedDestination +
+                //         "&mode=driving&departure_time=now&key="+ API_KEY;
+
+                String url = AUTO_BASE_URI + schedule.getSource() +
+                        "&destinations=" + schedule.getDestination() +
                         "&mode=driving&departure_time=now&key="+ API_KEY;
 
                 System.out.println("Fetching data from: " + url);
