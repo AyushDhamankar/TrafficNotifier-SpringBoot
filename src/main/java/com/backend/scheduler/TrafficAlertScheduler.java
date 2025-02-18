@@ -89,9 +89,31 @@ public class TrafficAlertScheduler {
             JsonNode trafficDurationText = elements.path("duration_in_traffic").path("text");
 
             if (!durationValue.isMissingNode() && schedule.getExpectedTime() > durationValue.asInt()) {
-                sendEmail(schedule, "Good News! No Traffic 🚗", NoTrafficTemplate, distanceText, durationText, trafficDurationText);
+                //sendEmail(schedule, "Good News! No Traffic 🚗", NoTrafficTemplate, distanceText, durationText, trafficDurationText);
+                try {
+                    emailService.sendHtmlEmail(schedule.getEmail(), "Good News! No Traffic 🚗",
+                            NoTrafficTemplate.replace("[SOURCE_LOCATION]", schedule.getSource())
+                            .replace("[DESTINATION_LOCATION]", schedule.getDestination())
+                            .replace("[DISTANCE]", String.valueOf(distanceText))
+                            .replace("[AVG_TIME]", String.valueOf(durationText))
+                            .replace("[TRAFFIC_TIME]", String.valueOf(trafficDurationText))
+                            .replace("[MAP_LINK]", "https://www.google.com/maps/dir/"+schedule.getSource()+"/"+schedule.getDestination()));
+                } catch (MessagingException e) {
+                    System.err.println("Failed to send email: " + e.getMessage());
+                }
             } else {
-                sendEmail(schedule, "Traffic Alert 🚦", TrafficTemplate, distanceText, durationText, trafficDurationText);
+                //sendEmail(schedule, "Traffic Alert 🚦", TrafficTemplate, distanceText, durationText, trafficDurationText);
+                try {
+                    emailService.sendHtmlEmail(schedule.getEmail(), "Traffic Alert 🚦",
+                            TrafficTemplate.replace("[SOURCE_LOCATION]", schedule.getSource())
+                            .replace("[DESTINATION_LOCATION]", schedule.getDestination())
+                            .replace("[DISTANCE]", String.valueOf(distanceText))
+                            .replace("[AVG_TIME]", String.valueOf(durationText))
+                            .replace("[TRAFFIC_TIME]", String.valueOf(trafficDurationText))
+                            .replace("[MAP_LINK]", "https://www.google.com/maps/dir/"+schedule.getSource()+"/"+schedule.getDestination()));
+                } catch (MessagingException e) {
+                    System.err.println("Failed to send email: " + e.getMessage());
+                }
             }
 
         } catch (IOException | InterruptedException e) {
