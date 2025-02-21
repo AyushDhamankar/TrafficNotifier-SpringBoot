@@ -56,11 +56,6 @@ public class TrafficAlertScheduler {
 
         for (TrafficEntity schedule : schedules) {
             if (schedule.getTime().contains(formattedTime)) {
-                System.out.println("Schedule Data: "+ schedule);
-                System.out.println(schedule.getSource());
-                System.out.println(schedule.getDestination());
-                System.out.println(schedule.getExpectedTime());
-                System.out.println(schedule.getEmail());
                 processTrafficAlert(schedule);
             }
         }
@@ -75,7 +70,7 @@ public class TrafficAlertScheduler {
             String url = String.format("%s%s&destinations=%s&mode=driving&departure_time=now&key=%s", 
                                         AUTO_BASE_URI, encodedSource, encodedDestination, API_KEY);
 
-            System.out.println("Fetching data from: " + url);
+            System.out.println("Fetching data from API");
 
             HttpRequest request = HttpRequest.newBuilder().GET().uri(URI.create(url)).build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -114,8 +109,6 @@ public class TrafficAlertScheduler {
             .replace("[AVG_TIME]", avgTime.asText())
             .replace("[TRAFFIC_TIME]", trafficTime.asText())
             .replace("[MAP_LINK]", String.format("https://www.google.com/maps/dir/%s/%s", schedule.getSource(), schedule.getDestination()));
-
-            System.out.println("Mail Data: "+schedule.getSource() +" "+ schedule.getEmail());
 
         try {
             emailService.sendHtmlEmail(schedule.getEmail(), subject, emailContent);
