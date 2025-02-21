@@ -56,6 +56,11 @@ public class TrafficAlertScheduler {
 
         for (TrafficEntity schedule : schedules) {
             if (schedule.getTime().contains(formattedTime)) {
+                System.out.println("Schedule Data: "+ schedule);
+                System.out.println(schedule.getSource());
+                System.out.println(schedule.getDestination());
+                System.out.println(schedule.getExpectedTime());
+                System.out.println(schedule.getEmail());
                 processTrafficAlert(schedule);
             }
         }
