@@ -89,8 +89,10 @@ public class TrafficAlertScheduler {
             JsonNode trafficDurationText = elements.path("duration_in_traffic").path("text");
 
             if (!durationValue.isMissingNode() && schedule.getExpectedTime() > durationValue.asInt()) {
+                System.out.println("Sending No Traffic Mail");
                 sendEmail(schedule, "Good News! No Traffic 🚗", NoTrafficTemplate, distanceText, durationText, trafficDurationText);
             } else {
+                System.out.println("Sending Traffic Mail");
                 sendEmail(schedule, "Traffic Alert 🚦", TrafficTemplate, distanceText, durationText, trafficDurationText);
             }
 
@@ -107,6 +109,8 @@ public class TrafficAlertScheduler {
             .replace("[AVG_TIME]", avgTime.asText())
             .replace("[TRAFFIC_TIME]", trafficTime.asText())
             .replace("[MAP_LINK]", String.format("https://www.google.com/maps/dir/%s/%s", schedule.getSource(), schedule.getDestination()));
+
+            System.out.println("Mail Data: "+schedule.getSource() +" "+ schedule.getEmail());
 
         try {
             emailService.sendHtmlEmail(schedule.getEmail(), subject, emailContent);
